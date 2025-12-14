@@ -295,6 +295,10 @@
             color: #856404;
             font-weight: 500;
         }
+
+                .example-questions.hidden {
+            display: none !important;
+        }
         
         @media (max-width: 768px) {
             .chat-container {
@@ -302,6 +306,17 @@
                 max-height: 100vh;
                 border-radius: 0;
             }
+
+                    .example-questions {
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .example-question {
+            font-size: 12px;
+            padding: 8px 12px;
+        }
             
             .message-content {
                 max-width: 85%;
@@ -412,6 +427,17 @@
             });
             
             sendButton.addEventListener('click', sendMessage);
+
+                    // Hide example questions after first interaction
+        const hideExamples = () => {
+            const exampleQuestions = document.querySelector('.example-questions');
+            if (exampleQuestions) {
+                exampleQuestions.classList.add('hidden');
+            }
+        };
+        
+        input.addEventListener('focus', hideExamples);
+        sendButton.addEventListener('click', hideExamples);
         });
         
         // Send message function
@@ -521,6 +547,9 @@
         // Example question handler
         function askExample(question) {
             document.getElementById('userInput').value = question;
+                    // Hide example questions
+        const exampleQuestions = document.querySelector('.example-questions');
+        if (exampleQuestions) exampleQuestions.classList.add('hidden');
             sendMessage();
         }
         
