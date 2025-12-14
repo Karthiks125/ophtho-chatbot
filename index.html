@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ophthalmology Healthcare Chatbot</title>
-    <meta name="description" content="AI-powered ophthalmology chatbot for healthcare information and support">
+    <title>Ophthalmology Q&A Assistant</title>
     <style>
         * {
             margin: 0;
@@ -13,59 +12,398 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 95vh;
+            max-height: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        .header h1 {
-            color: #667eea;
-            font-size: 2rem;
-            margin-bottom: 10px;
+        .chat-header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
         }
         
-        .header p {
-            color: #666;
-            font-size: 1rem;
+        .chat-header p {
+            font-size: 15px;
+            opacity: 0.95;
+            font-weight: 300;
         }
         
-        .chatbot-container {
+        .chat-info {
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            padding: 18px 25px;
+            border-bottom: 2px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 25px;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .info-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .info-description {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #555;
+            text-align: center;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            font-weight: 500;
+        }
+        
+        .chat-messages {
             flex: 1;
-            width: 100%;
-            height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding: 25px;
+            background: #f5f7fa;
         }
         
-        flowise-fullchatbot {
-            width: 100%;
-            height: 100%;
+        .message {
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+        
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .message-content {
+            max-width: 75%;
+            padding: 16px 20px;
+            border-radius: 18px;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+        
+        .message.bot .message-content {
+            background: white;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            border: 1px solid #e8e8e8;
+        }
+        
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            border: 1px solid #e8e8e8;
+            max-width: 90px;
+        }
+        
+        .typing-indicator.active {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .typing-indicator span {
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: scale(1); opacity: 0.5; }
+            30% { transform: scale(1.3); opacity: 1; }
+        }
+        
+        .chat-input-container {
+            padding: 20px 25px;
+            background: white;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        #userInput {
+            flex: 1;
+            padding: 16px 22px;
+            border: 2px solid #e0e0e0;
+            border-radius: 28px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        #userInput:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+        
+        #sendButton {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 28px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        #sendButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        #sendButton:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        #sendButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .example-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .example-question {
+            padding: 10px 16px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 22px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #667eea;
+            font-weight: 500;
+        }
+        
+        .example-question:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 14px;
+            border-radius: 10px;
+            margin: 12px 0;
+            border-left: 4px solid #c33;
+            font-size: 14px;
+        }
+        
+        .disclaimer {
+            background: #fff9e6;
+            padding: 12px 18px;
+            border-left: 4px solid #ffc107;
+            margin-top: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #856404;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .info-badge {
+                font-size: 12px;
+                padding: 8px 14px;
+            }
+            
+            .chat-header h1 {
+                font-size: 26px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🏥 Ophthalmology Healthcare Chatbot</h1>
-        <p>AI-Powered Eye Care Information & Support</p>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>👁️ Ophthalmology Q&A Assistant</h1>
+            <p>Evidence-based answers from curated medical literature</p>
+        </div>
+        
+        <div class="chat-info" style="text-align: center;">
+            <div>
+                <span class="info-badge">📚 Literature-Based Responses</span>
+                <span class="info-badge">🚫 No Internet Search</span>
+                <span class="info-badge">✅ Verified Sources Only</span>
+            </div>
+            <div class="info-description">
+                🎯 All answers are sourced exclusively from peer-reviewed ophthalmology literature and clinical textbooks
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <strong>Welcome to your trusted Ophthalmology knowledge companion!</strong><br><br>
+                    
+                    I'm powered by a curated library of peer-reviewed ophthalmology textbooks and research papers. Unlike general AI that searches the internet, <strong>I draw answers exclusively from verified medical literature</strong> I've been given.<br><br>
+                    
+                    <strong>I can help you understand:</strong>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Eye diseases and conditions (glaucoma, cataracts, retinal disorders, etc.)</li>
+                        <li>Treatment options and surgical procedures</li>
+                        <li>Diagnostic techniques and testing protocols</li>
+                    </ul>
+                    
+                    <strong>What makes this different:</strong><br>
+                    ✓ Every answer comes from established medical literature<br>
+                    ✓ No web scraping or unverified online sources<br>
+                    ✓ Responses are grounded in trusted ophthalmology textbooks<br>
+                    ✓ Consistent, reliable medical information<br><br>
+                    
+                    <div class="disclaimer">
+                        ⚠️ <strong>Important:</strong> This tool is for educational and informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult qualified healthcare providers for medical decisions.
+                    </div>
+                    <br>
+                    What would you like to learn about?
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="example-questions">
+                <button class="example-question" type="button" onclick="askExample('What are the symptoms and treatment options for glaucoma?')">
+                    Glaucoma symptoms & treatment
+                </button>
+                <button class="example-question" type="button" onclick="askExample('Explain the cataract surgery procedure step by step')">
+                    Cataract surgery explained
+                </button>
+                <button class="example-question" type="button" onclick="askExample('What is diabetic retinopathy and how is it managed?')">
+                    Diabetic retinopathy management
+                </button>
+                <button class="example-question" type="button" onclick="askExample('What are the most common causes of vision loss?')">
+                    Causes of vision loss
+                </button>
+            </div>
+            
+            <div class="chat-input-wrapper">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="Ask your ophthalmology assistant a question..." 
+                    autocomplete="off"
+                >
+                <button id="sendButton" type="button">Send</button>
+            </div>
+        </div>
     </div>
-    
-    <div class="chatbot-container">
-        <flowise-fullchatbot></flowise-fullchatbot>
-    </div>
-    
-    <script type="module">
-        import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
-        Chatbot.initFull({
-            chatflowid: "f8937ce1-c2be-4d5b-a5fb-71756a8eb3d1",
-            apiHost: "https://deathstrokeslade20-ophtho-chatbot.hf.space",
-        })
-    </script>
-</body>
-</html>
+
+    <script>
+        // Flowise Configuration
+        const FLOWISE_CHATFLOW_ID = 'f8937ce1-c2be-4d5b-a5fb-71756a8eb3d1';
+        const FLOWISE_API_URL = `https://deathstrokeslade20-ophtho-chatbot.hf.space/api/v1/prediction/${FLOWISE_CHATFLOW_ID}`;
+        
+        // Initialize event listeners when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
