@@ -352,10 +352,144 @@
         .message.bot .message-avatar {
             animation: gentlePulse 3s ease-in-out infinite;
         }
-    </style>
+    
+            /* ========== LIVELY PAGE ANIMATIONS ========== */
+        
+        /* Fade in animation for main container */
+        .chat-container {
+            animation: fadeInScale 0.6s ease-out;
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Floating animation for header */
+        .chat-header {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        /* Info badges slide in */
+        .info-badge {
+            animation: slideInFromLeft 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .info-badge:nth-child(1) { animation-delay: 0.1s; }
+        .info-badge:nth-child(2) { animation-delay: 0.2s; }
+        .info-badge:nth-child(3) { animation-delay: 0.3s; }
+        
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Shimmer effect for info description */
+        .info-description {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .info-description::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            to {
+                left: 100%;
+            }
+        }
+        
+        /* Example question buttons bounce on hover */
+        .example-question {
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .example-question:hover {
+            animation: bounce 0.6s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-10px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(-5px); }
+        }
+        
+        /* Send button pulse animation */
+        #sendButton:hover {
+            animation: buttonPulse 0.5s ease-in-out;
+        }
+        
+        @keyframes buttonPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Message fade in from bottom */
+        .message {
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Input field glow on focus */
+        #userInput:focus {
+            animation: inputGlow 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes inputGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.25);
+            }
+        }
+</style>
 </head>
 <body>
     <div class="chat-container">
+    
+        
         <div class="chat-header">
             <h1>👁️ Ophthalmology Q&A Assistant</h1>
             <p>Evidence-based answers from curated medical literature</p>
@@ -393,7 +527,11 @@
                     ✓ Consistent, reliable medical information<br><br>
                     
                     <div class="disclaimer">
-                        ⚠️ <strong>Important:</strong> This tool is for educational and informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult qualified healthcare providers for medical decisions.
+                        ⚠️ <strong>Important:</strong> Always consult qualified and informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult qualified healthcare providers for medical decisions.
+                    </div>
+
+                                            <div class="disclaimer" style="margin-top: 12px; border-left-color: #667eea;">
+                        © <strong>Copyright Protection:</strong> This assistant provides educational explanations based on medical knowledge but does NOT reproduce copyrighted text. All responses are paraphrased for educational purposes.
                     </div>
                     <br>
                     What would you like to learn about?
