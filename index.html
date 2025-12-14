@@ -480,7 +480,27 @@
             }
         }
         
-        // Add message to chat
+                // Format markdown text to HTML
+        function formatMessage(text) {
+            // Convert markdown bold (**text**) to HTML
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Convert single asterisk bullets (* item) to proper bullets
+            text = text.replace(/^\* (.+)$/gm, '<li>$1</li>');
+            
+            // Wrap consecutive list items in <ul> tags
+            text = text.replace(/(<li>.*<\/li>\n?)+/gs, '<ul>$&</ul>');
+            
+            // Add line breaks for paragraph separation (double newlines)
+            text = text.replace(/\n\n/g, '<br><br>');
+            
+            // Single newlines become single <br>
+            text = text.replace(/\n/g, '<br>');
+            
+            return text;
+        }
+        
+// Add message to chat
         function addMessage(text, sender, isError = false) {
             const messagesDiv = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
@@ -491,7 +511,7 @@
             
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
-                <div class="${contentClass}">${text}</div>
+                <div class="${contentClass}">${formatMessage(text)}</div>
             `;
             
             messagesDiv.appendChild(messageDiv);
