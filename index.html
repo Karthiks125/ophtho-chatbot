@@ -250,16 +250,16 @@
         }
         
         .example-questions {
+            position: relative;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 15px;
-                        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-                position: relative;
         
         .example-question {
             padding: 10px 16px;
@@ -280,7 +280,7 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
-                .close-suggestions {
+        .close-suggestions {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -320,7 +320,7 @@
             font-weight: 500;
         }
 
-                .example-questions.hidden {
+        .example-questions.hidden {
             display: none !important;
         }
         
@@ -331,16 +331,16 @@
                 border-radius: 0;
             }
 
-                    .example-questions {
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 10px;
-        }
+            .example-questions {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 10px;
+            }
 
-        .example-question {
-            font-size: 12px;
-            padding: 8px 12px;
-        }
+            .example-question {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
             
             .message-content {
                 max-width: 85%;
@@ -356,7 +356,7 @@
             }
         }
 
-                /* Animations */
+        /* Animations */
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
@@ -377,7 +377,7 @@
             animation: gentlePulse 3s ease-in-out infinite;
         }
     
-            /* ========== LIVELY PAGE ANIMATIONS ========== */
+        /* ========== LIVELY PAGE ANIMATIONS ========== */
         
         /* Fade in animation for main container */
         .chat-container {
