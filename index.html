@@ -255,6 +255,7 @@
             gap: 10px;
             margin-bottom: 15px;
         }
+                position: relative;
         
         .example-question {
             padding: 10px 16px;
@@ -545,6 +546,7 @@
                     Glaucoma symptoms & treatment
                 </button>
                 <button class="example-question" type="button" onclick="askExample('Explain the cataract surgery procedure step by step')">
+                                        <button class="close-suggestions" onclick="document.querySelector('.example-questions').style.display='none'" aria-label="Close suggestions" style="position: absolute; right: 10px; top: 10px; background: none; border: 2px solid #667eea; color: #667eea; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: all 0.3s; z-index: 10;" onmouseover="this.style.background='#667eea'; this.style.color='white';" onmouseout="this.style.background='none'; this.style.color='#667eea';">×</button>
                     Cataract surgery explained
                 </button>
                 <button class="example-question" type="button" onclick="askExample('What is diabetic retinopathy and how is it managed?')">
