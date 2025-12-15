@@ -275,6 +275,25 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
+
+                .close-suggestions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: #667eea;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+            transition: all 0.3s;
+        }
+
+        .close-suggestions:hover {
+            color: #ff4757;
+            transform: scale(1.2);
+        }
         
         .error-message {
             background: #fee;
@@ -542,11 +561,11 @@
         
         <div class="chat-input-container">
             <div class="example-questions">
+                                <button class="close-suggestions" onclick="document.querySelector('.example-questions').classList.add('hidden');">✕</button>
                 <button class="example-question" type="button" onclick="askExample('What are the symptoms and treatment options for glaucoma?')">
                     Glaucoma symptoms & treatment
                 </button>
                 <button class="example-question" type="button" onclick="askExample('Explain the cataract surgery procedure step by step')">
-                                        <button class="close-suggestions" onclick="document.querySelector('.example-questions').style.display='none'" aria-label="Close suggestions" style="position: absolute; right: 10px; top: 10px; background: none; border: 2px solid #667eea; color: #667eea; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: all 0.3s; z-index: 10;" onmouseover="this.style.background='#667eea'; this.style.color='white';" onmouseout="this.style.background='none'; this.style.color='#667eea';">×</button>
                     Cataract surgery explained
                 </button>
                 <button class="example-question" type="button" onclick="askExample('What is diabetic retinopathy and how is it managed?')">
