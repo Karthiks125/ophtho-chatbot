@@ -1,151 +1,271 @@
-<script>
-    // Flowise Configuration - UPDATED WITH NEW CHATFLOW ID
-    const FLOWISE_CHATFLOW_ID = '34b0f5a4-cb2e-4539-ad51-e420cdac38f5';
-    const FLOWISE_API_URL = `https://deathstrokeslade20-ophtho-chatbot.hf.space/api/v1/prediction/${FLOWISE_CHATFLOW_ID}`;
-    
-    // Initialize event listeners when page loads
-    document.addEventListener('DOMContentLoaded', function() {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ophthalmology Healthcare Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .chat-container {
+            width: 90%;
+            max-width: 600px;
+            height: 80vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        #chatMessages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            flex-shrink: 0;
+        }
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+        }
+        .message.user .message-content {
+            background: #667eea;
+            color: white;
+        }
+        .message.bot .message-content {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #f0f0f0;
+            border-radius: 18px;
+        }
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+            animation: bounce 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        #userInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #userInput:focus {
+            border-color: #667eea;
+        }
+        #sendButton {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        #sendButton:hover {
+            transform: scale(1.05);
+        }
+        #sendButton:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .error-message {
+            border-left: 3px solid #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            🏥 Ophthalmology Healthcare Assistant
+        </div>
+        <div id="chatMessages">
+            <div class="message bot">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">Hello! I'm your ophthalmology healthcare assistant. How can I help you today?</div>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" id="userInput" placeholder="Ask me about eye health...">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const FLOWISE_API_URL = 'https://deathstrokeslade20-ophtho-chatbot.hf.space/api/v1/prediction/34b0f5a4-cb2e-4539-ad51-e420cdac38f5';
+        
         const input = document.getElementById('userInput');
         const sendButton = document.getElementById('sendButton');
         
         input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter') {
                 e.preventDefault();
                 sendMessage();
             }
         });
         
         sendButton.addEventListener('click', sendMessage);
-
-        // Hide example questions after first interaction
-        const hideExamples = () => {
-            const exampleQuestions = document.querySelector('.example-questions');
-            if (exampleQuestions) {
-                exampleQuestions.classList.add('hidden');
+        input.focus();
+        
+        async function sendMessage() {
+            const message = input.value.trim();
+            if (!message) return;
+            
+            input.disabled = true;
+            sendButton.disabled = true;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            document.getElementById('chatMessages').appendChild(typingDiv);
+            scrollToBottom();
+            
+            try {
+                const response = await fetch(FLOWISE_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        question: message
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                typingDiv.remove();
+                
+                // Check for different response formats
+                const botResponse = data.text || data.answer || data.response || JSON.stringify(data);
+                addMessage(botResponse, 'bot');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                typingDiv.remove();
+                addMessage(`Error: ${error.message}. Please try again.`, 'bot', true);
+            } finally {
+                input.disabled = false;
+                sendButton.disabled = false;
+                input.focus();
             }
-        };
-        
-        input.addEventListener('focus', hideExamples);
-        sendButton.addEventListener('click', hideExamples);
-    });
-    
-    // Send message function
-    async function sendMessage() {
-        const input = document.getElementById('userInput');
-        const sendButton = document.getElementById('sendButton');
-        const message = input.value.trim();
-        
-        if (!message) return;
-        
-        // Disable input while processing
-        input.disabled = true;
-        sendButton.disabled = true;
-        
-        // Add user message to chat
-        addMessage(message, 'user');
-        input.value = '';
-        
-        // Show typing indicator
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'message bot';
-        typingDiv.innerHTML = `
-            <div class="message-avatar">🤖</div>
-            <div class="typing-indicator active">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        `;
-        document.getElementById('chatMessages').appendChild(typingDiv);
-        scrollToBottom();
-        
-        try {
-            // Call Flowise API
-            const response = await fetch(FLOWISE_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    question: message
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.status} - ${response.statusText}`);
-            }
-            
-            const data = await response.json();
-            
-            // Remove typing indicator
-            typingDiv.remove();
-            
-            // Add bot response
-            addMessage(data.text || data.answer || 'No response received', 'bot');
-            
-        } catch (error) {
-            console.error('Error:', error);
-            typingDiv.remove();
-            addMessage(`Sorry, I encountered an error: ${error.message}. Please try again or contact support.`, 'bot', true);
-        } finally {
-            // Re-enable input
-            input.disabled = false;
-            sendButton.disabled = false;
-            input.focus();
         }
-    }
-    
-    // Format markdown text to HTML
-    function formatMessage(text) {
-        // Convert markdown bold (**text**) to HTML
-        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         
-        // Convert single asterisk bullets (* item) to proper bullets
-        text = text.replace(/^\* (.+)$/gm, '<li>$1</li>');
+        function addMessage(text, sender, isError = false) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = sender === 'user' ? '👤' : '🤖';
+            const contentClass = isError ? 'message-content error-message' : 'message-content';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div class="${contentClass}">${formatMessage(text)}</div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            scrollToBottom();
+        }
         
-        // Wrap consecutive list items in <ul> tags
-        text = text.replace(/(<li>.*<\/li>\n?)+/gs, '<ul>$&</ul>');
+        function formatMessage(text) {
+            text = String(text);
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/^\* (.+)$/gm, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>\n?)+/gs, '<ul>$&</ul>');
+            text = text.replace(/\n\n/g, '<br><br>');
+            text = text.replace(/\n/g, '<br>');
+            return text;
+        }
         
-        // Add line breaks for paragraph separation (double newlines)
-        text = text.replace(/\n\n/g, '<br><br>');
-        
-        // Single newlines become single <br>
-        text = text.replace(/\n/g, '<br>');
-        
-        return text;
-    }
-    
-    // Add message to chat
-    function addMessage(text, sender, isError = false) {
-        const messagesDiv = document.getElementById('chatMessages');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-        
-        const avatar = sender === 'user' ? '👤' : '🤖';
-        const contentClass = isError ? 'message-content error-message' : 'message-content';
-        
-        messageDiv.innerHTML = `
-            <div class="message-avatar">${avatar}</div>
-            <div class="${contentClass}">${formatMessage(text)}</div>
-        `;
-        
-        messagesDiv.appendChild(messageDiv);
-        scrollToBottom();
-    }
-    
-    // Example question handler
-    function askExample(question) {
-        document.getElementById('userInput').value = question;
-        // Hide example questions
-        const exampleQuestions = document.querySelector('.example-questions');
-        if (exampleQuestions) exampleQuestions.classList.add('hidden');
-        sendMessage();
-    }
-    
-    // Scroll to bottom of chat
-    function scrollToBottom() {
-        const messagesDiv = document.getElementById('chatMessages');
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-</script>
-
+        function scrollToBottom() {
+            const messagesDiv = document.getElementById('chatMessages');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>
